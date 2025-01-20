@@ -57,111 +57,121 @@ const LabAnalystComponent = () => {
       headerName: "Tanggal",
       field: "metric_date",
       filter: "agDateColumnFilter",
+      pinned: "left",
     },
     {
         headerName: "Kolam",
       field: "pond_name",
+      pinned: "left",
     },
     {
         headerName: "DOC/DOP",
       field: "day_number",
+      pinned: "left",
     },
     {
         headerName: "Keterangan DOC.DOP",
       field: "doc_or_dop",
+      pinned: "left",
     },
     {
-        headerName: "Salinitas",
-        children: [
-            {
-                headerName: "Salinitas",
-              field: "sal",
-            },
-            {
-                headerName: "Waktu Salinitas",
-              field: "salinity_time",
-            },
-        ]
-    },
-    {
-        headerName: "DO",
-        children: [
-            {
-                headerName: "DO Pagi",
-              field: "do_time0500",
-            },
-            {
-                headerName: "Waktu DO Pagi",
-              field: "do_time0500_time",
-            },
-            {
-                headerName: "DO Siang",
-              field: "do_time1300",
-            },
-            {
-                headerName: "Waktu DO Siang",
-              field: "do_time1300_time",
-            },
-            {
-                headerName: "DO Malam",
-              field: "do_time2100",
-            },
-            {
-                headerName: "Waktu DO Malam",
-              field: "do_time2100_time",
-            },
-        ]
-    },
-    {
-      headerName: "pH",
+      headerName: "Fisika",
       children: [
         {
-          headerName: "pH Pagi",
-        field: "ph_time0430",
+          headerName: "Salinitas",
+          children: [
+              {
+                  headerName: "Salinitas",
+                field: "sal",
+              },
+              {
+                  headerName: "Waktu Salinitas",
+                field: "salinity_time",
+              },
+          ]
       },
       {
-          headerName: "Waktu pH Pagi",
-        field: "ph_time0430_time",
+          headerName: "DO",
+          children: [
+              {
+                  headerName: "DO Pagi",
+                field: "do_time0500",
+              },
+              {
+                  headerName: "Waktu DO Pagi",
+                field: "do_time0500_time",
+              },
+              {
+                  headerName: "DO Siang",
+                field: "do_time1300",
+              },
+              {
+                  headerName: "Waktu DO Siang",
+                field: "do_time1300_time",
+              },
+              {
+                  headerName: "DO Malam",
+                field: "do_time2100",
+              },
+              {
+                  headerName: "Waktu DO Malam",
+                field: "do_time2100_time",
+              },
+          ]
       },
       {
-          headerName: "pH Siang",
-        field: "ph_time1300",
+        headerName: "pH",
+        children: [
+          {
+            headerName: "pH Pagi",
+          field: "ph_time0430",
+        },
+        {
+            headerName: "Waktu pH Pagi",
+          field: "ph_time0430_time",
+        },
+        {
+            headerName: "pH Siang",
+          field: "ph_time1300",
+        },
+        {
+            headerName: "Waktu pH Siang",
+          field: "ph_time1300_time",
+        },
+        ]
       },
       {
-          headerName: "Waktu pH Siang",
-        field: "ph_time1300_time",
+        headerName: "Temperature",
+        children: [
+          {
+            headerName: "Temperature Pagi",
+          field: "temperature_time0500",
+        },
+        {
+            headerName: "Waktu Temperature Pagi",
+          field: "temperature_time0500_time",
+        },
+        {
+            headerName: "Temperature Siang",
+          field: "temperature_time1400",
+        },
+        {
+            headerName: "Waktu Temperature Siang",
+          field: "temperature_time1400_time",
+        },
+        {
+            headerName: "Temperature Malam",
+          field: "temperature_time2100",
+        },
+        {
+            headerName: "Waktu Temperature Malam",
+          field: "temperature_time2100_time",
+        },
+        ]
       },
       ]
     },
-    {
-      headerName: "Temperature",
-      children: [
-        {
-          headerName: "Temperature Pagi",
-        field: "temperature_time0500",
-      },
-      {
-          headerName: "Waktu Temperature Pagi",
-        field: "temperature_time0500_time",
-      },
-      {
-          headerName: "Temperature Siang",
-        field: "temperature_time1400",
-      },
-      {
-          headerName: "Waktu Temperature Siang",
-        field: "temperature_time1400_time",
-      },
-      {
-          headerName: "Temperature Malam",
-        field: "temperature_time2100",
-      },
-      {
-          headerName: "Waktu Temperature Malam",
-        field: "temperature_time2100_time",
-      },
-      ]
-    },
+    
     {
         headerName: "ORP Pagi",
       field: "orp_time_0500",
