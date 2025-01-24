@@ -22,10 +22,14 @@ import {
   TextFilterModule,
   ValidationModule,
   createGrid,
+  ProcessCellForExportParams,
+  ProcessGroupHeaderForExportParams,
+  ProcessHeaderForExportParams,
 } from "ag-grid-community";
 import {
   ColumnMenuModule,
 } from "ag-grid-enterprise";
+import { json } from "stream/consumers";
 
 // Set your license key here
 LicenseManager.setLicenseKey(process.env.NEXT_PUBLIC_AG_GRID_LICENSE_KEY || '');
@@ -47,6 +51,14 @@ ModuleRegistry.registerModules([
 
 const LabAnalystComponent = () => {
   const [rowData, setRowData] = useState<any[]>([]);
+  const [metrics, setMetrics] = useState([]);
+  const [arrayedData, setArrayedData] = useState<any[]>([]);
+  const [responseData, setResponseData] = useState();
+
+  // array of object
+  // id row itu
+  // value 
+  // nama attribute
 
   // Load JSON in here is really difficult
   // Column definitions for Sheet 2
@@ -81,8 +93,8 @@ const LabAnalystComponent = () => {
           headerName: "Salinitas",
           children: [
               {
-                  headerName: "Salinitas",
-                field: "sal",
+                  headerName: "Salinitas \n 25 ~ 33",
+                  field: "sal",
               },
               {
                   headerName: "Waktu Salinitas",
@@ -137,6 +149,14 @@ const LabAnalystComponent = () => {
         {
             headerName: "Waktu pH Siang",
           field: "ph_time1300_time",
+        },
+        {
+          headerName: "pH Range",
+          field: "range_ph",
+          valueGetter: (params: any) => {
+            let number = params.data.ph_time1300 - params.data.ph_time0430
+            return number.toPrecision(2)
+          }
         },
         ]
       },
@@ -766,9 +786,58 @@ const LabAnalystComponent = () => {
     },
   ]);
 
+
+  const handleFunction = function (params: any) {
+    let column = params.column.colId;
+    let newValue = params.newValue;
+    let id = params.data.id;
+
+    let newItem = 
+      {
+        id: id,
+        attribute_name: column,
+        value: newValue,
+      }
+
+      setArrayedData((prevArrayedData) => [...prevArrayedData, newItem]);
+  }
+
+  const handleButtonClick = async () => {
+    const res = await fetch("http://localhost:8080/public/v1/ag-grid/metrics", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(arrayedData),
+    });
+
+    const data = await res.json();
+
+    setResponseData(data);
+  }
+
   const [defaultColDef, setDefaultColDef] = useState({
     resizable: true,
+    editable: true,
+    onCellValueChanged: (params: any) => handleFunction(params),
+    enableCellExpresions: true,
   });
+
+  // const postMetrics = async () => {
+  //   const res = await fetch("/api/post-metrics", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({
+  //       key1: "value1",
+  //       key2: "value2",
+  //     }),
+  //   });
+
+  //   const data = await res.json();
+  //   // setResponse(data);
+  // };
 
   const rowSelection = useMemo(() => {
     return {
@@ -777,22 +846,84 @@ const LabAnalystComponent = () => {
   }, []);
 
   useEffect(() => {
-    setRowData(data);
+    async function fetchMetrics() {
+      const res = await fetch('http://localhost:8080/public/v1/ag-grid/metrics?disableLimit=true');
+      const response = await res.json();
+      setMetrics(response.data); // Adjust based on the actual structure of the response
+    }
+    fetchMetrics();
   }, []);
 
-  console.log(rowData);
+  // useEffect(() => {
+  //   setRowData(data);
+  // }, []);
+
+  console.log(metrics)
+
+  const cellSelectionMemo = useMemo(() => { 
+    return {
+          handle: {
+              mode: 'fill',
+              direction: 'y', // Fill Handle can only be dragged horizontally
+          }
+      };
+  }, []);
+
+  function processCellForClipboard(params: ProcessCellForExportParams) {
+    return "C-" + params.value;
+  }
+  
+  function processHeaderForClipboard(params: ProcessHeaderForExportParams) {
+    const colDef = params.column.getColDef();
+    let headerName = colDef.headerName || colDef.field || "";
+  
+    if (colDef.headerName !== "") {
+      headerName = headerName.charAt(0).toUpperCase() + headerName.slice(1);
+    }
+  
+    return "H-" + headerName;
+  }
+  
+  function processGroupHeaderForClipboard(
+    params: ProcessGroupHeaderForExportParams,
+  ) {
+    const colGroupDef = params.columnGroup.getColGroupDef() || ({} as any);
+    const headerName = colGroupDef.headerName || "";
+  
+    if (headerName === "") {
+      return "";
+    }
+  
+    return "GH-" + headerName;
+  }
+  
+  function processCellFromClipboard(params: ProcessCellForExportParams) {
+    return "Z-" + params.value;
+  }
 
   return (
-    <div style={{ width: "100%", height: "100vh" }}>
+    <>
+      {JSON.stringify(arrayedData)}
+
+      {JSON.stringify(responseData)}
+
+      <button onClick={handleButtonClick} style={{ padding: "10px 20px", fontSize: "16px" }}>TOMBOL</button>
+      <div style={{ width: "100%", height: "100vh" }}>
       <AgGridReact
-        rowData={rowData}
+        // rowData={rowData}
+        rowData={metrics}
         columnDefs={labAnalystColumn}
         defaultColDef={defaultColDef}
         enableCharts={true} // Enable the Charting features
-        cellSelection={true}
+        cellSelection={cellSelectionMemo}
         rowSelection={rowSelection as RowSelectionOptions}
+        // processCellForClipboard={processCellForClipboard}
+        // processHeaderForClipboard={processHeaderForClipboard}
+        // processGroupHeaderForClipboard={processGroupHeaderForClipboard}
+        // processCellFromClipboard={processCellFromClipboard}
       />
     </div>
+    </>
   );
 };
 
