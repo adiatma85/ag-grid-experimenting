@@ -31,7 +31,7 @@ import {
   ProcessGroupHeaderForExportParams,
   ProcessHeaderForExportParams,
 } from "ag-grid-community";
-import { ColumnMenuModule } from "ag-grid-enterprise";
+import { ColumnMenuModule, ClipboardModule, ExcelExportModule } from "ag-grid-enterprise";
 import { json } from "stream/consumers";
 
 import customStyles from "./LabAnalystComponent.module.css";
@@ -53,6 +53,8 @@ ModuleRegistry.registerModules([
   ColumnMenuModule,
   ContextMenuModule,
   ColumnAutoSizeModule,
+  ClipboardModule,
+  ExcelExportModule,
 ]);
 
 const LabAnalystComponent = () => {
@@ -1798,8 +1800,10 @@ const LabAnalystComponent = () => {
               hide: !labAnalystSheet,
               editable: false,
               valueGetter: (params) => {
-                let yellow: number = parseFloat(params.getValue("bactery_vibrio_y")) || 0;
-                let green: number = parseFloat(params.getValue("bactery_vibrio_g")) || 0;
+                let yellow: number =
+                  parseFloat(params.getValue("bactery_vibrio_y")) || 0;
+                let green: number =
+                  parseFloat(params.getValue("bactery_vibrio_g")) || 0;
 
                 const result: number = yellow + green;
                 handleFormulaValueChange(params, result.toFixed(2));
@@ -1838,11 +1842,14 @@ const LabAnalystComponent = () => {
             );
 
             // Step 1: Add Value 1, Value 2, Value 3, and Value 4
-            const sum = adjusted_count_petri1_tbc_1 + adjusted_count_petri2_tbc_1 + adjusted_count_petri1_tbc_2 + adjusted_count_petri2_tbc_2;
+            const sum =
+              adjusted_count_petri1_tbc_1 +
+              adjusted_count_petri2_tbc_1 +
+              adjusted_count_petri1_tbc_2 +
+              adjusted_count_petri2_tbc_2;
 
             // Step 2: Calculate the denominator
-            const denominator =
-              (1 * total_count_tbc_1 + 0.1 * total_count_tbc_2);
+            const denominator = 1 * total_count_tbc_1 + 0.1 * total_count_tbc_2;
 
             // Step 3: Check if the denominator is 0 (to avoid division by zero)
             if (denominator === 0) {
@@ -1850,7 +1857,7 @@ const LabAnalystComponent = () => {
             }
 
             // Step 4: Divide the sum by the denominator
-            const result = sum * Math.pow(10, dilution) / denominator;
+            const result = (sum * Math.pow(10, dilution)) / denominator;
 
             handleFormulaValueChange(params, result.toFixed(2));
 
@@ -1864,7 +1871,8 @@ const LabAnalystComponent = () => {
           field: "bactery_tvc_tbc",
           cellClass: customStyles.shaded_column,
           valueGetter: (params) => {
-            let tvc: number = parseFloat(params.getValue("bactery_vibrio_tvc")) || 0;
+            let tvc: number =
+              parseFloat(params.getValue("bactery_vibrio_tvc")) || 0;
             let tbc: number = parseFloat(params.getValue("bactery_tbc")) || 0;
 
             if (tbc === 0) {
@@ -3315,6 +3323,7 @@ const LabAnalystComponent = () => {
     return {
       mode: "multiRow",
       pinned: "left",
+      checkboxLocation: "autoGroupColumn",
     };
   }, []);
 
@@ -3401,18 +3410,6 @@ const LabAnalystComponent = () => {
         TOMBOL TOGEL
       </button>
 
-      {/* <button
-        onClick={handleLaPlanktonSheet}
-        style={{ padding: "10px 20px", fontSize: "16px" }}
-      >
-        TOMBOL LAB PLANKTON
-      </button>
-      <button
-        onClick={handleLaCalculationSheet}
-        style={{ padding: "10px 20px", fontSize: "16px" }}
-      >
-        TOMBOL LAB CALCULATION
-      </button> */}
       <div style={{ width: "100%", height: "100vh" }}>
         <AgGridReact
           // rowData={rowData}
@@ -3420,9 +3417,10 @@ const LabAnalystComponent = () => {
           columnDefs={labAnalystColumn}
           defaultColDef={defaultColDef}
           enableCharts={true} // Enable the Charting features
-          // cellSelection={cellSelectionMemo}
-          cellSelection={true}
-          // rowSelection={rowSelection as RowSelectionOptions}
+          cellSelection={cellSelectionMemo}
+          animateRows={true}
+          rowDragManaged={true}
+          rowSelection={rowSelection as RowSelectionOptions}
           // processCellForClipboard={processCellForClipboard}
           // processHeaderForClipboard={processHeaderForClipboard}
           // processGroupHeaderForClipboard={processGroupHeaderForClipboard}
